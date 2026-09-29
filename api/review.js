@@ -59,27 +59,39 @@ INSTRUCTIONS:
 2. Identify any potential issues (e.g., ambiguity, stress triggers, unhelpful jargon).
 3. Provide 1 to 2 improved copy suggestions tailored specifically to this Inspera persona.`;
 
-    // Updated model endpoint to gemini-3.8-flash
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey.trim()}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
-    });
+    // List of models to attempt sequentially if one is overloaded or unavailable
+    const modelsToTry = [
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro'
+    ];
 
-    const data = await response.json();
+    let lastError = '';
 
-    if (!response.ok) {
-      return res.status(500).json({ error: data.error?.message || 'Error response from Gemini API.' });
+    for (const model of modelsToTry) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          const resultText = data.candidates[0].content.parts[0].text;
+          return res.status(200).json({ feedback: resultText });
+        }
+
+        lastError = data.error?.message || `Model ${model} returned an empty response.`;
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-      return res.status(500).json({ error: 'Unexpected response format from Gemini API.' });
-    }
-
-    const resultText = data.candidates[0].content.parts[0].text;
-    return res.status(200).json({ feedback: resultText });
+    return res.status(500).json({ error: `High demand on AI models. Details: ${lastError}` });
   } catch (error) {
     return res.status(500).json({ error: `Server Error: ${error.message}` });
   }
