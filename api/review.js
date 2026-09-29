@@ -59,8 +59,8 @@ INSTRUCTIONS:
 2. Identify any potential issues (e.g., ambiguity, stress triggers, unhelpful jargon).
 3. Provide 1 to 2 improved copy suggestions tailored specifically to this Inspera persona.`;
 
-    // Updated model endpoint to gemini-2.5-flash
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`, {
+    // Updated model endpoint to gemini-3.8-flash
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey.trim()}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
