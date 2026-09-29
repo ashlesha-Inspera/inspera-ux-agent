@@ -59,11 +59,12 @@ INSTRUCTIONS:
 2. Identify any potential issues (e.g., ambiguity, stress triggers, unhelpful jargon).
 3. Provide 1 to 2 improved copy suggestions tailored specifically to this Inspera persona.`;
 
-    // Updated model list with supported active models
+    // Active Gemini 3.x endpoints
     const modelsToTry = [
       'gemini-3.8-flash',
-      'gemini-2.5-flash',
-      'gemini-2.5-flash-lite'
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite'
     ];
 
     let lastError = '';
