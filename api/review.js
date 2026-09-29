@@ -59,11 +59,11 @@ INSTRUCTIONS:
 2. Identify any potential issues (e.g., ambiguity, stress triggers, unhelpful jargon).
 3. Provide 1 to 2 improved copy suggestions tailored specifically to this Inspera persona.`;
 
-    // List of models to attempt sequentially if one is overloaded or unavailable
+    // Updated model list with supported active models
     const modelsToTry = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro'
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite'
     ];
 
     let lastError = '';
@@ -85,13 +85,13 @@ INSTRUCTIONS:
           return res.status(200).json({ feedback: resultText });
         }
 
-        lastError = data.error?.message || `Model ${model} returned an empty response.`;
+        lastError = `[${model}]: ${data.error?.message || 'Empty response'}`;
       } catch (err) {
-        lastError = err.message;
+        lastError = `[${model}]: ${err.message}`;
       }
     }
 
-    return res.status(500).json({ error: `High demand on AI models. Details: ${lastError}` });
+    return res.status(500).json({ error: `API Error: ${lastError}` });
   } catch (error) {
     return res.status(500).json({ error: `Server Error: ${error.message}` });
   }
